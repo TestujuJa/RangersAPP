@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+sqlalchemy
+psycopg2-binary
+elasticsearch
+minio
+tensorflow
+torch
+spacy
+opencv-python
+pytesseract
+Pillow
+spacy

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+      - minio
+    environment:
+      - MINIO_URL=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password # ZMĚŇTE TOTO HESLO V PRODUKCI!
+      - POSTGRES_DB=ranger_db
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9001:9001" # Web UI
+      - "9000:9000" # API
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin # ZMĚŇTE TOTO HESLO V PRODUKCI!
+    command: server /data --console-address ":9001"
+
+volumes:
+  postgres_data:
+  minio_data:
