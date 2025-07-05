@@ -1,5 +1,14 @@
+
 import React from 'react';
 import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import AppNavigator from './src/navigation/AppNavigator';
+
+// Definice barev pro světlý/tmavý režim
+const Colors = {
+  black: '#000',
+  white: '#fff',
+  lighter: '#f3f3f3',
+};
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -20,6 +29,7 @@ function App(): JSX.Element {
           <Text>Vítejte v Ranger Mobile App!</Text>
         </View>
       </ScrollView>
+      <AppNavigator />
     </SafeAreaView>
   );
 }
