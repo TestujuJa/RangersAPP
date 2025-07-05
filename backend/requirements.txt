@@ -9,4 +9,6 @@ spacy==3.5.3
 pdfplumber==0.7.4
 openpyxl==3.0.9
 python-docx==0.8.11
-https://github.com/explosion/spacy-models/releases/download/cs_core_news_lg-3.5.0/cs_core_news_lg-3.5.0-py3-none-any.whl
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cs_core_news_sm

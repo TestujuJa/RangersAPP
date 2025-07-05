@@ -382,5 +382,3 @@ const ProjectDetail: React.FC = () => {
 };
 
 export default ProjectDetail;
-
-export default ProjectDetail;

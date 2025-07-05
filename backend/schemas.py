@@ -1,4 +1,31 @@
+
 from pydantic import BaseModel
+from typing import Optional
+
+# --- Uživatelská autentizace ---
+class UserBase(BaseModel):
+    username: str
+    email: str
+    role: Optional[str] = "user"
+
+class UserCreate(UserBase):
+    password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class UserOut(UserBase):
+    id: int
+    class Config:
+        orm_mode = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
 
 class DocumentBase(BaseModel):
     filename: str

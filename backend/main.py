@@ -1,7 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, File, UploadFile, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from . import models, schemas, crud
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
 from minio import Minio
 import os
 from io import StringIO, BytesIO
@@ -10,6 +13,14 @@ from PIL import Image
 import pytesseract
 import cv2
 import numpy as np
+
+
+# --- JWT nastavení ---
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecret")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 app = FastAPI()
 
@@ -22,6 +33,8 @@ minio_client = Minio(
 )
 
 # Dependency
+# Dependency
+
 def get_db():
     db = models.SessionLocal()
     try:
@@ -29,8 +42,60 @@ def get_db():
     finally:
         db.close()
 
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = schemas.TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+    user = crud.get_user_by_username(db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+def get_current_active_user(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
+def get_current_admin_user(current_user: models.User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return current_user
+@app.post("/auth/register", response_model=schemas.UserOut)
+def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_username(db, user.username)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    return crud.create_user(db, user)
+
+@app.post("/auth/login", response_model=schemas.Token)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = crud.get_user_by_username(db, form_data.username)
+    if not user or not crud.verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
+
 @app.post("/projects/", response_model=schemas.Project)
-def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db)):
+def create_project(
+    project: schemas.ProjectCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user)
+):
     return crud.create_project(db=db, project=project)
 
 @app.get("/projects/", response_model=list[schemas.Project])
@@ -49,7 +114,8 @@ def read_project(project_id: int, db: Session = Depends(get_db)):
 def update_project(
     project_id: int,
     project: schemas.ProjectCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user)
 ):
     db_project = crud.update_project(db=db, project_id=project_id, project=project)
     if db_project is None:
@@ -57,7 +123,11 @@ def update_project(
     return db_project
 
 @app.delete("/projects/{project_id}")
-def delete_project(project_id: int, db: Session = Depends(get_db)):
+def delete_project(
+    project_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_admin_user)
+):
     db_project = crud.delete_project(db=db, project_id=project_id)
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
