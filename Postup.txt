@@ -1,43 +1,41 @@
 Seznam Simulací a Placeholderů k Implementaci
 
 
-   1. Extrakce klíčových dat z dokumentů (pomocí spaCy):
-       * Popis: Backendová funkce extract_key_data_from_text v crud.py v současné době provádí velmi základní extrakci dat (pouze číselné entity jako "QUANTITY" nebo "CARDINAL").
-       * Co je potřeba: Implementovat sofistikovanější logiku pro extrakci specifických klíčových dat (např. rozměry, nosnosti, milníky, data) z textu získaného OCR, a to i z PDF a XLSX souborů (což by
-         vyžadovalo další knihovny pro parsování těchto formátů). To by pravděpodobně zahrnovalo trénování vlastních modelů spaCy nebo použití pokročilejších technik zpracování přirozeného jazyka (NLP).
+1.  **Extrakce klíčových dat z dokumentů (pomocí spaCy):**
+    *   **Popis:** Backendová funkce `extract_key_data_from_text` v `crud.py` v současné době provádí velmi základní extrakci dat (pouze číselné entity jako "QUANTITY" nebo "CARDINAL").
+    *   **Co je potřeba:** Implementovat sofistikovanější logiku pro extrakci specifických klíčových dat (např. rozměry, nosnosti, milníky, data) z textu získaného OCR, a to i z PDF a XLSX souborů (což by vyžadovalo další knihovny pro parsování těchto formátů). To by pravděpodobně zahrnovalo trénování vlastních modelů spaCy nebo použití pokročilejších technik zpracování přirozeného jazyka (NLP).
 
 
-   2. Mobilní aplikace pro techniky (React Native):
-       * Popis: Byla vytvořena pouze základní struktura projektu React Native.
-       * Co je potřeba:
-           * Kompletní implementace UI: Vytvoření všech obrazovek (seznam projektů, detail projektu, formulář pro hlášení postupu, nahrávání fotodokumentace).
-           * Integrace s backendem: Propojení mobilní aplikace s existujícím FastAPI backendem pro získávání a odesílání dat.
-           * Offline režim: Implementace lokálního ukládání dat, synchronizační logiky s backendem a řešení konfliktů. To je klíčová a nejsložitější část mobilní aplikace.
+2.  **Mobilní aplikace pro techniky (React Native):**
+    *   **Popis:** Byla vytvořena pouze základní struktura projektu React Native. Implementace UI, integrace s backendem a offline režim jsou potřeba.
+    *   **Co je potřeba:**
+        *   **Kompletní implementace UI:** Vytvoření všech obrazovek (seznam projektů, detail projektu, formulář pro hlášení postupu, nahrávání fotodokumentace).
+        *   **Integrace s backendem:** Propojení mobilní aplikace s existujícím FastAPI backendem pro získávání a odesílání dat.
+        *   **Offline režim:** Implementace lokálního ukládání dat, synchronizační logiky s backendem a řešení konfliktů. To je klíčová a nejsložitější část mobilní aplikace.
 
 
-   3. Analýza fotodokumentace (Detekce anomálií pomocí OpenCV):
-       * Popis: Funkce detect_anomaly_in_image v crud.py je v současné době pouze simulací. Provádí velmi jednoduchou a arbitrární kontrolu (např. průměrná červená složka obrazu).
-       * Co je potřeba: Implementovat skutečnou logiku detekce anomálií. To by zahrnovalo:
-           * Definování konkrétních typů anomálií (např. chybějící šrouby, nesprávné sestavení, poškození).
-           * Použití pokročilých algoritmů počítačového vidění (např. detekce objektů, segmentace, porovnávání obrazů) nebo trénování modelů strojového učení (např. konvoluční neuronové sítě) pro rozpoznávání
-             těchto anomálií.
-           * Integrace s reálnými daty a trénovacími sadami.
+3.  **Analýza fotodokumentace (Detekce anomálií pomocí OpenCV):**
+    *   **Popis:** Funkce `detect_anomaly_in_image` v `crud.py` je v současné době pouze simulací. Provádí velmi jednoduchou a arbitrární kontrolu (např. průměrná červená složka obrazu).
+    *   **Co je potřeba:** Implementovat skutečnou logiku detekce anomálií. To by zahrnovalo:
+        *   Definování konkrétních typů anomálií (např. chybějící šrouby, nesprávné sestavení, poškození).
+        *   Použití pokročilých algoritmů počítačového vidění (např. detekce objektů, segmentace, porovnávání obrazů) nebo trénování modelů strojového učení (např. konvoluční neuronové sítě) pro rozpoznávání těchto anomálií.
+        *   Integrace s reálnými daty a trénovacími sadami.
 
 
-   4. Bezpečnostní hardening:
-       * Popis: Byly přidány komentáře do docker-compose.yml upozorňující na nutnost změny výchozích hesel.
-       * Co je potřeba: Provedení komplexního bezpečnostního auditu celé aplikace (backend, databáze, MinIO, frontend) a implementace všech doporučených bezpečnostních opatření, jako jsou:
-           * Správa uživatelů a rolí s minimálními oprávněními.
-           * Zabezpečená autentizace a autorizace (např. JWT tokeny, OAuth2).
-           * Validace vstupů a ochrana proti běžným webovým zranitelnostem (SQL injection, XSS, CSRF).
-           * Zabezpečení komunikace (HTTPS) v produkčním prostředí.
-           * Pravidelné aktualizace závislostí a skenování zranitelností.
+4.  **Bezpečnostní hardening:**
+    *   **Popis:** Byly přidány komentáře do `docker-compose.yml` upozorňující na nutnost změny výchozích hesel. Základní zabezpečení je implementováno, ale komplexní audit je potřeba.
+    *   **Co je potřeba:** Provedení komplexního bezpečnostního auditu celé aplikace (backend, databáze, MinIO, frontend) a implementace všech doporučených bezpečnostních opatření, jako jsou:
+        *   Správa uživatelů a rolí s minimálními oprávněními.
+        *   Zabezpečená autentizace a autorizace (např. JWT tokeny, OAuth2).
+        *   Validace vstupů a ochrana proti běžným webovým zranitelnostem (SQL injection, XSS, CSRF).
+        *   Zabezpečení komunikace (HTTPS) v produkčním prostředí.
+        *   Pravidelné aktualizace závislostí a skenování zranitelností.
 
 
-   5. Rozšířená realita (AR):
-       * Popis: Tato funkcionalita byla pouze konceptuálně probrána a neimplementována.
-       * Co je potřeba:
-           * Vývoj AR funkcionality v mobilní aplikaci (pomocí ARCore/ARKit nebo React Native AR).
-           * Integrace 3D modelů regálů.
-           * Implementace logiky pro umístění, škálování a interakci s 3D modely v reálném prostoru.
-           * To je velmi náročný úkol vyžadující specializované znalosti a nástroje.
+5.  **Rozšířená realita (AR):**
+    *   **Popis:** Tato funkcionalita byla pouze konceptuálně probrána a neimplementována. Je to velmi náročný úkol.
+    *   **Co je potřeba:**
+        *   Vývoj AR funkcionality v mobilní aplikaci (pomocí ARCore/ARKit nebo React Native AR).
+        *   Integrace 3D modelů regálů.
+        *   Implementace logiky pro umístění, škálování a interakci s 3D modely v reálném prostoru.
+        *   To je velmi náročný úkol vyžadující specializované znalosti a nástroje.
